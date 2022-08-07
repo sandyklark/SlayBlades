@@ -1,5 +1,6 @@
 using System;
 using Effects;
+using GameplaySingletons;
 using UnityEngine;
 
 public enum Team { BUNNY_PUNK, BEAR_CORE }
@@ -30,9 +31,10 @@ public class BattleCharacter : MonoBehaviour
     {
         _currentHealth -= amount;
         if (_currentHealth < 0) _currentHealth = 0;
-        _sprite.color = _flashFlag ? Color.white : Color.red;
+        _sprite.color = Color.red;
         _flashFlag = !_flashFlag;
 
+        DamageTextEmitter.Instance.Emit(transform.position, amount, Color.white);
         CameraShake.instance.Shake(amount);
         _rigid.AddForce(direction * 10f, ForceMode2D.Impulse);
 
