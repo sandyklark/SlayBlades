@@ -20,6 +20,7 @@ public class BattleCharacter : MonoBehaviour
     private Color _initialColor;
     private bool _flashFlag;
     private Rigidbody2D _rigid;
+    private bool _wrongTeamDebuff;
     private bool _isDead;
 
     private void Awake()
@@ -38,6 +39,8 @@ public class BattleCharacter : MonoBehaviour
             _rigid.AddForce(direction * amount / 4f, ForceMode2D.Impulse);
             return;
         }
+
+        if (_wrongTeamDebuff) amount = Mathf.CeilToInt(amount * 1.5f);
 
         _currentHealth -= amount;
         if (_currentHealth < 0) _currentHealth = 0;
@@ -63,5 +66,13 @@ public class BattleCharacter : MonoBehaviour
         if(blood != null) blood.Emit(30);
         _sprite.color = Color.black;
         OnDeath?.Invoke();
+    }
+
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.TryGetComponent<TeamAlignment>(out var otherTeam))
+        {
+            _wrongTeamDebuff = otherTeam.team != team;
+        }
     }
 }
