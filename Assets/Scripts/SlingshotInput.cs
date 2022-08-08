@@ -19,6 +19,7 @@ public class SlingshotInput : MonoBehaviour
 
         var position = transform.position;
         var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = position.z;
         _output = position - mousePos;
         Debug.DrawLine(position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
 
