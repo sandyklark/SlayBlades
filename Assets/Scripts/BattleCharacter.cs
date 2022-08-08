@@ -9,6 +9,8 @@ public enum Team { BUNNY_PUNK, BEAR_CORE }
 [RequireComponent(typeof(Rigidbody2D))]
 public class BattleCharacter : MonoBehaviour
 {
+    public Action OnDeath;
+
     public int health = 100;
     public Team team;
     public ParticleSystem blood;
@@ -18,6 +20,7 @@ public class BattleCharacter : MonoBehaviour
     private Color _initialColor;
     private bool _flashFlag;
     private Rigidbody2D _rigid;
+    private bool _isDead;
 
     private void Awake()
     {
@@ -29,6 +32,13 @@ public class BattleCharacter : MonoBehaviour
 
     public void Damage(int amount, Vector2 direction)
     {
+        if (_isDead)
+        {
+            CameraShake.instance.Shake(amount / 2f);
+            _rigid.AddForce(direction * amount / 4f, ForceMode2D.Impulse);
+            return;
+        }
+
         _currentHealth -= amount;
         if (_currentHealth < 0) _currentHealth = 0;
         _sprite.color = Color.red;
@@ -36,14 +46,22 @@ public class BattleCharacter : MonoBehaviour
 
         DamageTextEmitter.Instance.Emit(transform.position, amount, Color.white);
         CameraShake.instance.Shake(amount);
-        _rigid.AddForce(direction * 10f, ForceMode2D.Impulse);
+        _rigid.AddForce(direction * amount, ForceMode2D.Impulse);
 
         if(blood != null) blood.Emit(3 * amount);
     }
 
     private void Update()
     {
+        if (_isDead) return;
+
         _sprite.color = Color.Lerp(_sprite.color, _initialColor, Time.deltaTime * 8f);
-        if(_currentHealth == 0) _sprite.color = Color.black;
+        if (_currentHealth != 0) return;
+
+        _isDead = true;
+        CameraShake.instance.Shake(20);
+        if(blood != null) blood.Emit(30);
+        _sprite.color = Color.black;
+        OnDeath?.Invoke();
     }
 }
