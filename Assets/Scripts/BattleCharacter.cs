@@ -40,7 +40,7 @@ public class BattleCharacter : MonoBehaviour
             return;
         }
 
-        if (_wrongTeamDebuff) amount *= 3;
+        if (_wrongTeamDebuff) amount = Mathf.CeilToInt(amount * 1.5f);
 
         _currentHealth -= amount;
         if (_currentHealth < 0) _currentHealth = 0;

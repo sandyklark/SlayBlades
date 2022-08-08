@@ -11,7 +11,7 @@ public class DeathTrigger : MonoBehaviour
 
     private void Awake()
     {
-        _collider = GetComponent<Collider2D>();
+        _collider = GetComponent<CircleCollider2D>();
         _sprite = GetComponent<SpriteRenderer>();
         _innerSprites = GetComponentsInChildren<SpriteRenderer>();
         var character = GetComponent<BattleCharacter>();
