@@ -1,7 +1,8 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class SlingshotInput : MonoBehaviour
+public class SlingshotInput : NetworkBehaviour
 {
     public Action<Vector2> OnRelease;
 
@@ -15,6 +16,7 @@ public class SlingshotInput : MonoBehaviour
 
     private void OnMouseDrag()
     {
+        if(!IsOwner) return;
         if (Camera.main == null) return;
 
         var position = transform.position;
@@ -32,7 +34,18 @@ public class SlingshotInput : MonoBehaviour
 
     private void OnMouseUp()
     {
-        OnRelease?.Invoke(_output);
+        if (IsOwner)
+        {
+            FireSlingshotServerRpc(_output);
+        }
+
         _line.positionCount = 0;
     }
+
+    [ServerRpc]
+    private void FireSlingshotServerRpc(Vector2 direction, ServerRpcParams serverRpcParams = default)
+    {
+        OnRelease?.Invoke(direction);
+    }
 }
+

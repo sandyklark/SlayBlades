@@ -1,13 +1,15 @@
 using System;
 using Effects;
 using GameplaySingletons;
+using Unity.Netcode;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public enum Team { BUNNY_PUNK, BEAR_CORE }
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(Rigidbody2D))]
-public class BattleCharacter : MonoBehaviour
+public class BattleCharacter : NetworkBehaviour
 {
     public Action OnDeath;
 
@@ -22,14 +24,6 @@ public class BattleCharacter : MonoBehaviour
     private Rigidbody2D _rigid;
     private bool _wrongTeamDebuff;
     private bool _isDead;
-
-    private void Awake()
-    {
-        _rigid = GetComponent<Rigidbody2D>();
-        _sprite = GetComponent<SpriteRenderer>();
-        _initialColor = _sprite.color;
-        _currentHealth = health;
-    }
 
     public void Damage(int amount, Vector2 direction)
     {
@@ -52,6 +46,31 @@ public class BattleCharacter : MonoBehaviour
         _rigid.AddForce(direction * amount, ForceMode2D.Impulse);
 
         if(blood != null) blood.Emit(3 * amount);
+    }
+
+    private void Awake()
+    {
+        _rigid = GetComponent<Rigidbody2D>();
+        _sprite = GetComponent<SpriteRenderer>();
+        _initialColor = _sprite.color;
+        _currentHealth = health;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        var isPlayer1 = OwnerClientId == 0;
+
+        InitPlayerClientRpc(isPlayer1);
+    }
+
+    [ClientRpc]
+    private void InitPlayerClientRpc(bool isPlayer1)
+    {
+        Debug.Log(isPlayer1);
+        transform.position = new Vector3(isPlayer1 ? -5 : 5, 0, 0);
+        _initialColor = isPlayer1 ? Color.green : Color.cyan;
+        team = isPlayer1 ? Team.BUNNY_PUNK : Team.BEAR_CORE;
     }
 
     private void Update()
