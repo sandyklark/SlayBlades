@@ -125,7 +125,7 @@ namespace Networking
             };
 
             Debug.Log($"Joining: {joinCode}");
-            NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>().SetClientRelayData(
+            NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>().SetRelayServerData(
                 data.IPv4Address,
                 data.Port,
                 data.AllocationIDBytes,
