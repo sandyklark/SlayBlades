@@ -4,6 +4,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
+using Unity.Services.Relay;
 using UnityEngine;
 
 namespace Networking
@@ -58,7 +59,7 @@ namespace Networking
 
             //Ask Unity Services to allocate a Relay server
             Debug.Log("Requesting Relay Allocation: STARTING");
-            var allocation = await Unity.Services.Relay.RelayService.Instance.CreateAllocationAsync(maxConn);
+            var allocation = await RelayService.Instance.CreateAllocationAsync(maxConn);
             Debug.Log("Requesting Relay Allocation: DONE");
 
             //Populate the hosting data
@@ -74,11 +75,10 @@ namespace Networking
             };
 
             //Retrieve the Relay join code for our clients to join our party
-            data.JoinCode = await Unity.Services.Relay.RelayService.Instance.GetJoinCodeAsync(data.AllocationID);
-
+            data.JoinCode = await RelayService.Instance.GetJoinCodeAsync(data.AllocationID);
 
             Debug.Log("Join Code: " + data.JoinCode);
-            NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>().SetHostRelayData(
+            NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>().SetRelayServerData(
                 data.IPv4Address,
                 data.Port,
                 data.AllocationIDBytes,
@@ -109,7 +109,7 @@ namespace Networking
             }
 
             //Ask Unity Services for allocation data based on a join code
-            var allocation = await Unity.Services.Relay.RelayService.Instance.JoinAllocationAsync(joinCode);
+            var allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
 
             //Populate the joining data
             var data = new RelayJoinData
