@@ -95,7 +95,7 @@ namespace Networking
         public async void JoinGame()
         {
             // Get join code string
-            var joinCode = networkUI.GetJoinCodeText();
+            var joinCode = networkUI.GetJoinCodeText().ToUpperInvariant();
             Debug.Log($"Got join code: {joinCode}");
 
             //Initialize the Unity Services engine

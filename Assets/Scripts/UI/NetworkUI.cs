@@ -1,11 +1,11 @@
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
     public class NetworkUI : MonoBehaviour
     {
-        public TextMeshProUGUI inputText;
+        public Text inputText;
 
         public string GetJoinCodeText()
         {
